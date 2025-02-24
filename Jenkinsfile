@@ -4,19 +4,20 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'calculator'
         GITHUB_REPO_URL = 'https://github.com/sakina27/Scientific-Calculator.git'
+        DOCKER_HUB_USER = 'saki2726'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: "${https://github.com/sakina27/Scientific-Calculator}"
+                git branch: 'main', url: GITHUB_REPO_URL
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${saki2726/calculator}", '.')
+                    docker.build("${DOCKER_HUB_USER}/${DOCKER_IMAGE_NAME}", '.')
                 }
             }
         }
@@ -24,9 +25,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('', 'DockerHubCred') {
-                        sh 'docker tag calculator saki2726/calculator:latest'
-                        sh 'docker push saki2726/calculator'
+                    docker.withRegistry('', 'DockerHubCred') { // Make sure 'DockerHubCred' exists in Jenkins Credentials
+                        sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_HUB_USER}/${DOCKER_IMAGE_NAME}:latest"
+                        sh "docker push ${DOCKER_HUB_USER}/${DOCKER_IMAGE_NAME}"
                     }
                 }
             }
@@ -44,3 +45,4 @@ pipeline {
         }
     }
 }
+
